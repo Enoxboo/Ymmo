@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ymmo - Inscription</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../config.js"></script>
+    <meta name="description" content="Rejoignez le réseau Ymmo et gérez vos biens immobiliers en toute simplicité. Créez votre compte agent en quelques secondes.">
+</head>
+<body class="min-h-screen bg-snow font-sans antialiased h-screen overflow-hidden flex flex-col">
+
+<header class="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl sticky top-0 z-50 flex-shrink-0">
+    <div class="flex items-center space-x-2">
+        <img src="../assets/logo.webp" alt="Ymmo" class="h-9 sm:h-10 lg:h-12 w-auto">
+    </div>
+    <a href="../index.html"
+       class="bg-indigo text-snow text-sm px-4 sm:px-6 py-2 sm:py-2.5 lg:px-8 lg:py-3 rounded-xl font-bold hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap">
+        Voir le site
+    </a>
+</header>
+
+<main class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 overflow-hidden">
+    <section class="bg-indigo/95 backdrop-blur-xl w-full max-w-md sm:max-w-lg lg:max-w-xl rounded-3xl p-6 sm:p-8 lg:p-12 shadow-2xl border border-indigo/30 text-snow flex flex-col">
+
+        <div class="text-center mb-6 pb-5 border-b border-snow/20">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-snow mb-2 sm:mb-3 leading-tight tracking-tight">
+                Nouveau <span class="text-amber">Compte</span>
+            </h1>
+            <p class="text-snow/80 text-sm sm:text-base lg:text-lg font-light max-w-sm mx-auto leading-relaxed">
+                Rejoignez le réseau Ymmo
+            </p>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="flex flex-col space-y-4 sm:space-y-5 mt-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label for="prenom" class="block text-xs sm:text-sm font-semibold text-snow tracking-wide">Prénom</label>
+                    <input id="prenom" type="text" required
+                           class="w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-2xl border-2 border-snow/30 bg-snow/10 backdrop-blur-sm focus:border-amber focus:ring-4 ring-amber/30 transition-all text-white placeholder-white shadow-inner text-sm"
+                           placeholder="Jean">
+                </div>
+                <div class="space-y-2">
+                    <label for="nom" class="block text-xs sm:text-sm font-semibold text-snow tracking-wide">Nom</label>
+                    <input id="nom" type="text" required
+                           class="w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-2xl border-2 border-snow/30 bg-snow/10 backdrop-blur-sm focus:border-amber focus:ring-4 ring-amber/30 transition-all text-white placeholder-white shadow-inner text-sm"
+                           placeholder="Dupont">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="email" class="block text-xs sm:text-sm font-semibold text-snow tracking-wide">Email professionnel</label>
+                <input id="email" type="email" required
+                       class="w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-2xl border-2 border-snow/30 bg-snow/10 backdrop-blur-sm focus:border-amber focus:ring-4 ring-amber/30 transition-all text-white placeholder-white shadow-inner text-sm"
+                       placeholder="agent@ymmo.fr">
+            </div>
+
+            <div class="space-y-2">
+                <label for ="password" class="block text-xs sm:text-sm font-semibold text-snow tracking-wide">Mot de passe</label>
+                <input id="password" type="password" required
+                       class="w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-2xl border-2 border-snow/30 bg-snow/10 backdrop-blur-sm focus:border-amber focus:ring-4 ring-amber/30 transition-all text-white placeholder-white shadow-inner text-sm"
+                       placeholder="••••••••">
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-amber text-indigo py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-2xl hover:bg-indigo/80 transition-all border-2 border-snow/20 mt-2">
+                Créer mon compte
+            </button>
+        </div>
+
+        <!-- Lien bas -->
+        <div class="mt-6 pt-5 border-t border-snow/20">
+            <p class="text-center text-snow text-xs sm:text-sm">
+                Déjà inscrit ? <a href="login.html" class="text-amber font-semibold hover:underline transition-all">Se connecter</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>
