@@ -1,6 +1,6 @@
 window.tailwindColors = {
-    indigo: '#1A1A2E',
-    amber: '#DFA408',
+    indigo: '#002446',
+    amber: '#dfa408',
     snow: '#F9FAFA'
 };
 

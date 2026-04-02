@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@theme {
+    --color-snow: #ffffff;
+    --color-amber: #fcd34d;
+    --color-indigo: #3730a3;
+}
