@@ -4,13 +4,16 @@ import RegisterPage from './pages/register'
 import AboutPage from './pages/about'
 import BienPage from "./pages/bien.jsx";
 import AdminPage from "./pages/admin.jsx";
+import HomePage from './pages/homepage';
+import BienAllPage from './pages/bien-all'
 
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/bien-all" element={<BienAllPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path={"/about"} element={<AboutPage />} />
