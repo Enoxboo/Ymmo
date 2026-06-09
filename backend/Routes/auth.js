@@ -1,95 +1,82 @@
 const express = require('express')
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { PrismaClient } = require('@prisma/client')
+const prisma = require('../prisma/client')
 const { requireAuth } = require('../Middlewares/auth')
 
-const prisma = new PrismaClient()
 const router = express.Router()
 
 router.post('/register', async (req, res) => {
-    const { email, password, firstName, lastName } = req.body
-
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email et mot de passe requis' })
-    }
-
-    if (password.length < 8) {
-        return res.status(400).json({ error: 'Le mot de passe doit contenir au moins 8 caractères' })
-    }
-
     try {
-        const normalizedEmail = email.toLowerCase().trim()
+        const { email, password, firstName, lastName } = req.body
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email et mot de passe requis' })
+        }
 
         const existingUser = await prisma.user.findUnique({
-            where: { email: normalizedEmail },
+            where: { email },
         })
 
         if (existingUser) {
-            return res.status(409).json({ error: 'Email indisponible.' })
+            return res.status(409).json({ error: 'Un compte existe déjà avec cet email' })
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
 
         const user = await prisma.user.create({
             data: {
-                email: normalizedEmail,
+                email,
                 password: hashedPassword,
-                firstName: firstName?.trim() || null,
-                lastName: lastName?.trim() || null,
+                firstName: firstName || null,
+                lastName: lastName || null,
                 role: 'USER',
             },
             select: {
                 id: true,
                 email: true,
+                role: true,
                 firstName: true,
                 lastName: true,
-                role: true,
-                createdAt: true,
             },
         })
 
-        return res.status(201).json(user)
-    } catch (err) {
-        console.error('POST /api/auth/register error:', err)
-        return res.status(500).json({ error: 'Erreur serveur' })
+        const token = jwt.sign(
+            { userId: user.id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        )
+
+        return res.status(201).json({ token, user })
+    } catch (error) {
+        return res.status(500).json({ error: 'Erreur serveur lors de l’inscription' })
     }
 })
 
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body
-
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email et mot de passe requis' })
-    }
-
-    if (!process.env.JWT_SECRET) {
-        return res.status(500).json({ error: 'JWT_SECRET manquant côté serveur' })
-    }
-
     try {
-        const normalizedEmail = email.toLowerCase().trim()
+        const { email, password } = req.body
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email et mot de passe requis' })
+        }
 
         const user = await prisma.user.findUnique({
-            where: { email: normalizedEmail },
+            where: { email },
         })
 
         if (!user) {
             return res.status(401).json({ error: 'Identifiants invalides' })
         }
 
-        const isValidPassword = await bcrypt.compare(password, user.password)
+        const isPasswordValid = await bcrypt.compare(password, user.password)
 
-        if (!isValidPassword) {
+        if (!isPasswordValid) {
             return res.status(401).json({ error: 'Identifiants invalides' })
         }
 
         const token = jwt.sign(
-            {
-                userId: user.id,
-                email: user.email,
-                role: user.role,
-            },
+            { userId: user.id, role: user.role },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         )
@@ -99,40 +86,18 @@ router.post('/login', async (req, res) => {
             user: {
                 id: user.id,
                 email: user.email,
+                role: user.role,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                role: user.role,
             },
         })
-    } catch (err) {
-        console.error('POST /api/auth/login error:', err)
-        return res.status(500).json({ error: 'Erreur serveur' })
+    } catch (error) {
+        return res.status(500).json({ error: 'Erreur serveur lors de la connexion' })
     }
 })
 
 router.get('/me', requireAuth, async (req, res) => {
-    try {
-        const user = await prisma.user.findUnique({
-            where: { id: req.auth.userId },
-            select: {
-                id: true,
-                email: true,
-                firstName: true,
-                lastName: true,
-                role: true,
-                createdAt: true,
-            },
-        })
-
-        if (!user) {
-            return res.status(404).json({ error: 'Utilisateur introuvable' })
-        }
-
-        return res.json(user)
-    } catch (err) {
-        console.error('GET /api/auth/me error:', err)
-        return res.status(500).json({ error: 'Erreur serveur' })
-    }
+    return res.json({ user: req.user })
 })
 
 module.exports = router

@@ -1,86 +1,120 @@
-import { Link } from 'react-router-dom'
-import logo from '../assets/logo.webp'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { registerUser, saveAuth } from '../services/auth'
 
 function RegisterPage() {
+    const navigate = useNavigate()
+    const [form, setForm] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+    })
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
+
+    async function handleSubmit(e) {
+        e.preventDefault()
+        setError('')
+        setLoading(true)
+
+        try {
+            const data = await registerUser({
+                firstName: form.firstName,
+                lastName: form.lastName,
+                email: form.email,
+                password: form.password,
+            })
+
+            saveAuth(data)
+            navigate('/')
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
-        <div className="min-h-screen bg-snow font-sans antialiased h-screen overflow-hidden flex flex-col">
-            <header className="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl sticky top-0 z-50 flex-shrink-0">
-                <div className="flex items-center space-x-2">
-                    <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto" />
-                </div>
-                <a
-                    href="/"
-                    className="bg-indigo text-white text-sm px-4 sm:px-6 py-2 sm:py-2.5 lg:px-8 lg:py-3 rounded-xl font-bold hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap"
-                >
-                    Voir le site
-                </a>
-            </header>
+        <div className="min-h-screen flex items-center justify-center bg-snow px-4">
+            <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8">
+                <h1 className="text-3xl font-black text-indigo mb-6">Inscription</h1>
 
-            <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6 overflow-hidden">
-                <section className="bg-indigo backdrop-blur-xl w-full max-w-md sm:max-w-lg lg:max-w-xl rounded-3xl p-6 sm:p-8 lg:p-12 shadow-2xl border border-white/20 text-white flex flex-col">
-                    <div className="text-center mb-6 pb-5 border-b border-white/20">
-                        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-2 sm:mb-3 leading-tight tracking-tight">
-                            S'<span className="text-amber">inscrire</span>
-                        </h1>
-                        <p className="text-white text-sm sm:text-base lg:text-lg font-light max-w-sm mx-auto leading-relaxed">
-                            Rejoignez le réseau Ymmo
-                        </p>
+                {error && (
+                    <p className="mb-4 text-red-600 font-medium">{error}</p>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block mb-2 text-sm font-semibold text-indigo">
+                            Prénom
+                        </label>
+                        <input
+                            type="text"
+                            value={form.firstName}
+                            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+                            placeholder="Benoit"
+                        />
                     </div>
 
-                    <form className="flex flex-col space-y-4 sm:space-y-5 mt-4">
-                        <div className="space-y-2">
-                            <label
-                                htmlFor="email"
-                                className="block text-xs sm:text-sm font-semibold text-white tracking-wide"
-                            >
-                                Email professionnel
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                required
-                                className="w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-2xl border-2 border-white/30 bg-white/10 backdrop-blur-sm focus:border-amber focus:ring-4 ring-amber/30 transition-all text-white placeholder-white/60 shadow-inner text-sm"
-                                placeholder="agent@ymmo.fr"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label
-                                htmlFor="password"
-                                className="block text-xs sm:text-sm font-semibold text-white tracking-wide"
-                            >
-                                Mot de passe
-                            </label>
-                            <input
-                                id="password"
-                                type="password"
-                                required
-                                className="w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-2xl border-2 border-white/30 bg-white/10 backdrop-blur-sm focus:border-amber focus:ring-4 ring-amber/30 transition-all text-white placeholder-white/60 shadow-inner text-sm"
-                                placeholder="••••••••"
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="w-full bg-amber text-indigo py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-2xl hover:bg-amber/90 transition-all mt-2"
-                        >
-                            Créer mon compte
-                        </button>
-                    </form>
-
-                    <div className="mt-6 pt-5 border-t border-white/20">
-                        <p className="text-center text-white/90 text-xs sm:text-sm">
-                            Déjà un compte ?{' '}
-                            <Link
-                                to="/login"
-                                className="text-amber font-semibold hover:underline transition-all"
-                            >
-                                Se connecter
-                            </Link>
-                        </p>
+                    <div>
+                        <label className="block mb-2 text-sm font-semibold text-indigo">
+                            Nom
+                        </label>
+                        <input
+                            type="text"
+                            value={form.lastName}
+                            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+                            placeholder="Pascal"
+                        />
                     </div>
-                </section>
-            </main>
+
+                    <div>
+                        <label className="block mb-2 text-sm font-semibold text-indigo">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            value={form.email}
+                            onChange={(e) => setForm({ ...form, email: e.target.value })}
+                            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+                            placeholder="test@ymmo.fr"
+                            required
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block mb-2 text-sm font-semibold text-indigo">
+                            Mot de passe
+                        </label>
+                        <input
+                            type="password"
+                            value={form.password}
+                            onChange={(e) => setForm({ ...form, password: e.target.value })}
+                            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+                            placeholder="Mot de passe"
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-indigo text-white py-3 rounded-xl font-bold hover:bg-indigo/90 transition-all disabled:opacity-60"
+                    >
+                        {loading ? 'Inscription...' : 'Créer un compte'}
+                    </button>
+                </form>
+
+                <p className="mt-6 text-sm text-indigo/70">
+                    Déjà inscrit ?{' '}
+                    <Link to="/login" className="font-bold text-indigo">
+                        Se connecter
+                    </Link>
+                </p>
+            </div>
         </div>
     )
 }
