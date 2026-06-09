@@ -1,113 +1,180 @@
-require('dotenv').config()
 const { PrismaClient } = require('@prisma/client')
-const bcrypt = require('bcryptjs')
 
 const prisma = new PrismaClient()
 
 async function main() {
-    const {
-        SEED_ADMIN_EMAIL,
-        SEED_ADMIN_PASSWORD,
-        SEED_USER_EMAIL,
-        SEED_USER_PASSWORD,
-    } = process.env
-
-    if (!SEED_ADMIN_EMAIL || !SEED_ADMIN_PASSWORD || !SEED_USER_EMAIL || !SEED_USER_PASSWORD) {
-        throw new Error('Variables de seed manquantes dans .env')
-    }
+    console.log('Seeding...')
 
     await prisma.propertyPhoto.deleteMany()
     await prisma.propertyHighlight.deleteMany()
     await prisma.property.deleteMany()
     await prisma.agency.deleteMany()
-    await prisma.user.deleteMany()
 
-    const adminPasswordHash = await bcrypt.hash(SEED_ADMIN_PASSWORD, 10)
-    const userPasswordHash = await bcrypt.hash(SEED_USER_PASSWORD, 10)
-
-    await prisma.user.create({
+    const agencyParis = await prisma.agency.create({
         data: {
-            email: SEED_ADMIN_EMAIL,
-            password: adminPasswordHash,
-            firstName: 'Admin',
-            lastName: 'Ymmo',
-            role: 'ADMIN',
+            name: 'Ymmo Paris',
+            email: 'paris@ymmo.fr',
+            phone: '01 42 00 00 00',
+            address: '12 rue de Rivoli',
+            city: 'Paris',
+            postalCode: '75004',
         },
     })
 
-    await prisma.user.create({
+    const agencyBordeaux = await prisma.agency.create({
         data: {
-            email: SEED_USER_EMAIL,
-            password: userPasswordHash,
-            firstName: 'Client',
-            lastName: 'Test',
-            role: 'USER',
-        },
-    })
-
-    const agencyTalence = await prisma.agency.create({
-        data: {
-            name: 'Ymmo Talence',
-            email: 'contact@ymmo.fr',
+            name: 'Ymmo Bordeaux',
+            email: 'bordeaux@ymmo.fr',
             phone: '05 56 00 00 00',
-            address: '162 cours Gambetta',
-            city: 'Talence',
-            postalCode: '33400',
+            address: '8 cours de l’Intendance',
+            city: 'Bordeaux',
+            postalCode: '33000',
         },
     })
 
-    await prisma.property.create({
+    const property1 = await prisma.property.create({
         data: {
-            reference: '00674709',
-            title: 'Studio T1 / F1 31 m² à vendre',
-            description:
-                "Situé à Talence, ce studio de 31 m² représente une belle opportunité pour un premier achat ou un investissement locatif.",
-            price: 148000,
-            city: 'Talence',
-            postalCode: '33400',
-            address: 'Talence (33400)',
-            district: 'Secteur résidentiel proche commodités',
-            transportInfo: 'Tram et bus accessibles rapidement',
+            reference: 'YM-PAR-001',
+            title: 'Appartement lumineux au cœur de Paris',
+            description: 'Très bel appartement rénové, proche des commerces et transports.',
+            price: 465000,
+            city: 'Paris',
+            postalCode: '75011',
+            address: '25 rue Oberkampf',
+            district: 'Bastille / Oberkampf',
+            transportInfo: 'Métro et bus à moins de 5 minutes',
             type: 'APPARTEMENT',
-            subType: 'Studio T1 / F1',
-            surface: 31,
-            rooms: 1,
-            bedrooms: 0,
+            subType: 'T3',
+            surface: 72,
+            rooms: 3,
+            bedrooms: 2,
             bathrooms: 1,
-            floor: 2,
+            floor: 3,
             elevator: true,
             parking: false,
-            balcony: false,
+            balcony: true,
             terrace: false,
             available: true,
             dpe: 'D',
             ges: 'B',
-            agency: {
-                connect: { id: agencyTalence.id },
-            },
-            photos: {
-                create: [
-                    { url: 'https://via.placeholder.com/1200x800?text=Studio+Talence+1', alt: 'Photo 1', position: 0 },
-                    { url: 'https://via.placeholder.com/1200x800?text=Studio+Talence+2', alt: 'Photo 2', position: 1 },
-                    { url: 'https://via.placeholder.com/1200x800?text=Studio+Talence+3', alt: 'Photo 3', position: 2 },
-                ],
-            },
-            highlights: {
-                create: [
-                    { label: 'Proche commerces et transports', position: 0 },
-                    { label: 'Idéal primo-accédant ou investisseur', position: 1 },
-                    { label: 'Résidence sécurisée', position: 2 },
-                ],
-            },
+            agencyId: agencyParis.id,
         },
     })
 
-    console.log('Seed sécurisé terminé.')
+    const property2 = await prisma.property.create({
+        data: {
+            reference: 'YM-BDX-001',
+            title: 'Maison familiale avec jardin',
+            description: 'Maison spacieuse idéale pour une famille, avec extérieur agréable.',
+            price: 620000,
+            city: 'Bordeaux',
+            postalCode: '33200',
+            address: '14 avenue du Parc',
+            district: 'Caudéran',
+            transportInfo: 'Bus direct centre-ville',
+            type: 'MAISON',
+            subType: 'Maison 5 pièces',
+            surface: 145,
+            rooms: 5,
+            bedrooms: 4,
+            bathrooms: 2,
+            floor: null,
+            elevator: false,
+            parking: true,
+            balcony: false,
+            terrace: true,
+            available: true,
+            dpe: 'C',
+            ges: 'C',
+            agencyId: agencyBordeaux.id,
+        },
+    })
+
+    const property3 = await prisma.property.create({
+        data: {
+            reference: 'YM-BDX-002',
+            title: 'Local commercial bien placé',
+            description: 'Local professionnel avec vitrine dans un secteur passant.',
+            price: 310000,
+            city: 'Bordeaux',
+            postalCode: '33000',
+            address: '5 rue Sainte-Catherine',
+            district: 'Centre-ville',
+            transportInfo: 'Tram A et B',
+            type: 'LOCAL',
+            subType: 'Local commercial',
+            surface: 95,
+            rooms: 2,
+            bedrooms: 0,
+            bathrooms: 1,
+            floor: 0,
+            elevator: false,
+            parking: false,
+            balcony: false,
+            terrace: false,
+            available: true,
+            dpe: 'E',
+            ges: 'C',
+            agencyId: agencyBordeaux.id,
+        },
+    })
+
+    await prisma.propertyPhoto.createMany({
+        data: [
+            {
+                url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80',
+                alt: 'Salon appartement Paris',
+                position: 1,
+                propertyId: property1.id,
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80',
+                alt: 'Chambre appartement Paris',
+                position: 2,
+                propertyId: property1.id,
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80',
+                alt: 'Maison familiale Bordeaux',
+                position: 1,
+                propertyId: property2.id,
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80',
+                alt: 'Jardin maison Bordeaux',
+                position: 2,
+                propertyId: property2.id,
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
+                alt: 'Local commercial Bordeaux',
+                position: 1,
+                propertyId: property3.id,
+            },
+        ],
+    })
+
+    await prisma.propertyHighlight.createMany({
+        data: [
+            { label: 'Proche métro', position: 1, propertyId: property1.id },
+            { label: 'Appartement rénové', position: 2, propertyId: property1.id },
+            { label: 'Balcon', position: 3, propertyId: property1.id },
+
+            { label: 'Jardin privatif', position: 1, propertyId: property2.id },
+            { label: '4 chambres', position: 2, propertyId: property2.id },
+            { label: 'Parking', position: 3, propertyId: property2.id },
+
+            { label: 'Vitrine sur rue', position: 1, propertyId: property3.id },
+            { label: 'Centre-ville', position: 2, propertyId: property3.id },
+        ],
+    })
+
+    console.log('Seed terminé.')
 }
 
 main()
     .catch((e) => {
-        console.error('Seed error:', e)
+        console.error(e)
         process.exit(1)
     })
     .finally(async () => {
