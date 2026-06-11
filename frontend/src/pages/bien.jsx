@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { getPropertyById } from '../services/properties'
-import Header from "../../components/Header.jsx";
+import Header from '../../components/Header.jsx'
 
 const API_URL = import.meta.env.VITE_API_URL
 const FILE_URL = import.meta.env.VITE_FILE_URL || API_URL.replace('/api', '')
@@ -96,6 +96,7 @@ function BienPage() {
 
             <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
                 <div className="max-w-7xl mx-auto">
+                    {/* En-tête du bien */}
                     <section className="mb-8">
                         <p className="text-sm text-indigo/70 mb-2">
                             Achat &gt; {formatType(bien.type)} &gt; {bien.city} ({bien.postalCode})
@@ -114,6 +115,7 @@ function BienPage() {
                         </div>
                     </section>
 
+                    {/* Photos + encadré prix / agence */}
                     <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                         <div className="lg:col-span-2 space-y-4">
                             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
@@ -177,7 +179,9 @@ function BienPage() {
                                 </div>
                                 <div className="bg-snow rounded-2xl p-4 text-center">
                                     <p className="text-xs text-indigo/60 mb-1">Étage</p>
-                                    <p className="text-lg font-black text-indigo">{bien.floor ?? '—'}</p>
+                                    <p className="text-lg font-black text-indigo">
+                                        {bien.floor ?? '—'}
+                                    </p>
                                 </div>
                                 <div className="bg-snow rounded-2xl p-4 text-center">
                                     <p className="text-xs text-indigo/60 mb-1">Référence</p>
@@ -186,23 +190,45 @@ function BienPage() {
                             </div>
 
                             {bien.agency && (
-                                <div className="border-t border-indigo/10 pt-5">
-                                    <p className="text-sm text-indigo/70 mb-1">Agence</p>
-                                    <p className="text-lg font-black text-indigo">{bien.agency.name}</p>
-                                    {bien.agency.address && (
-                                        <p className="text-sm text-indigo/80 mt-2">{bien.agency.address}</p>
-                                    )}
-                                    {bien.agency.phone && (
-                                        <p className="text-sm text-indigo/80">{bien.agency.phone}</p>
-                                    )}
-                                    {bien.agency.email && (
-                                        <p className="text-sm text-indigo/80">{bien.agency.email}</p>
-                                    )}
+                                <div className="border-t border-indigo/10 pt-5 space-y-3">
+                                    <div>
+                                        <p className="text-sm text-indigo/70 mb-1">Agence</p>
+                                        <p className="text-lg font-black text-indigo">
+                                            {bien.agency.name}
+                                        </p>
+                                    </div>
+
+                                    <div className="bg-snow rounded-2xl p-4 space-y-1">
+                                        {bien.agency.address && (
+                                            <p className="text-sm text-indigo/80">
+                                                <span className="font-semibold">Adresse : </span>
+                                                {bien.agency.address}
+                                            </p>
+                                        )}
+                                        {bien.agency.phone && (
+                                            <p className="text-sm text-indigo/80">
+                                                <span className="font-semibold">Téléphone : </span>
+                                                {bien.agency.phone}
+                                            </p>
+                                        )}
+                                        {bien.agency.email && (
+                                            <p className="text-sm text-indigo/80">
+                                                <span className="font-semibold">Email : </span>
+                                                {bien.agency.email}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <p className="text-xs text-indigo/60">
+                                        Pour plus d’informations ou organiser une visite, utilisez
+                                        directement ces coordonnées pour contacter l’agence.
+                                    </p>
                                 </div>
                             )}
                         </aside>
                     </section>
 
+                    {/* Description, caractéristiques, points forts */}
                     <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 space-y-6">
                             <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
@@ -277,6 +303,7 @@ function BienPage() {
                             )}
                         </div>
 
+                        {/* Localisation */}
                         <div className="space-y-6">
                             <div className="bg-white rounded-3xl shadow-2xl p-6 sm:px-8">
                                 <h2 className="text-2xl font-black text-indigo mb-4">
