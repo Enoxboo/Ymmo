@@ -4,13 +4,11 @@ const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
-// Génère une référence unique simple du type REF-123456
 function generateReference() {
     const random = Math.floor(100000 + Math.random() * 900000)
     return `REF-${random}`
 }
 
-// GET /api/properties
 router.get('/', async (req, res) => {
     try {
         const { q, type, page = 1, take = 10 } = req.query
@@ -50,7 +48,6 @@ router.get('/', async (req, res) => {
     }
 })
 
-// GET /api/properties/:id
 router.get('/:id', async (req, res) => {
     try {
         const id = Number(req.params.id)
@@ -77,7 +74,6 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-// POST /api/properties
 router.post('/', async (req, res) => {
     try {
         const {
@@ -146,7 +142,6 @@ router.post('/', async (req, res) => {
     }
 })
 
-// PUT /api/properties/:id
 router.put('/:id', async (req, res) => {
     const id = Number(req.params.id)
 
@@ -165,7 +160,7 @@ router.put('/:id', async (req, res) => {
         bathrooms,
         floor,
         dpe,
-        // photos (si tu gères la mise à jour des photos plus tard)
+        photos,
     } = req.body
 
     const data = {}
@@ -202,11 +197,9 @@ router.put('/:id', async (req, res) => {
         data.dpe = dpe === '' ? null : dpe
     }
 
-    // Relation agence
+
     if (agencyId !== undefined) {
         if (agencyId === '' || agencyId === null) {
-            // si tu veux pouvoir détacher une agence, tu peux activer:
-            // data.agency = { disconnect: true }
         } else {
             data.agency = {
                 connect: { id: Number(agencyId) },
@@ -232,7 +225,6 @@ router.put('/:id', async (req, res) => {
     }
 })
 
-// DELETE /api/properties/:id
 router.delete('/:id', async (req, res) => {
     try {
         const id = Number(req.params.id)
