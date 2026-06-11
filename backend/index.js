@@ -2,21 +2,27 @@ require('dotenv').config()
 
 const express = require('express')
 const cors = require('cors')
+const path = require('path')
 
 const authRoutes = require('./Routes/auth')
 const adminRoutes = require('./Routes/admin')
 const propertyRoutes = require('./Routes/properties')
 const userRoutes = require('./Routes/users')
+const agencyRoutes = require('./Routes/agencies')
+const uploadRoutes = require('./Routes/upload')
+const { ensureSeedUsers } = require('./initSuperAdmin') // <-- nouveau nom
 
 const app = express()
 
 const PORT = process.env.PORT
 const CORS_ORIGIN = process.env.CORS_ORIGIN
 
-app.use(cors({
-    origin: CORS_ORIGIN,
-    credentials: true,
-}))
+app.use(
+    cors({
+        origin: CORS_ORIGIN,
+        credentials: true,
+    }),
+)
 
 app.use(express.json())
 
@@ -28,15 +34,18 @@ app.use('/api/auth', authRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/properties', propertyRoutes)
 app.use('/api/users', userRoutes)
-const agencyRoutes = require('./Routes/agencies')
 app.use('/api/agencies', agencyRoutes)
-const path = require('path')
-const uploadRoutes = require('./Routes/upload')
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-
 app.use('/api/upload', uploadRoutes)
 
-app.listen(PORT, () => {
-    console.log(`Serveur lancé sur http://localhost:${PORT}`)
-})
+ensureSeedUsers()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Serveur lancé sur http://localhost:${PORT}`)
+        })
+    })
+    .catch((err) => {
+        console.error('Erreur lors du seeding des utilisateurs :', err)
+        process.exit(1)
+    })

@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import logo from '../assets/logo.webp'
-import { getUser, logoutUser } from '../services/auth'
+import { getUser } from '../services/auth'
 import { getUsers, updateUserRole, deleteUser } from '../services/users'
+import Header from '../../components/Header.jsx'
 
 function AdminUsersPage() {
-    const navigate = useNavigate()
     const currentUser = getUser()
     const [users, setUsers] = useState([])
     const [total, setTotal] = useState(0)
@@ -32,17 +30,12 @@ function AdminUsersPage() {
         loadUsers()
     }, [page])
 
-    function handleLogout() {
-        logoutUser()
-        navigate('/login')
-    }
-
     async function handleRoleChange(id, newRole) {
         try {
             setError('')
             const updated = await updateUserRole(id, newRole)
             setUsers((prev) =>
-                prev.map((u) => (u.id === id ? { ...u, role: updated.role } : u))
+                prev.map((u) => (u.id === id ? { ...u, role: updated.role } : u)),
             )
         } catch (err) {
             setError(err.message)
@@ -68,34 +61,7 @@ function AdminUsersPage() {
 
     return (
         <div className="min-h-screen bg-snow font-sans antialiased flex flex-col">
-            <header className="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl sticky top-0 z-50">
-                <div className="flex items-center space-x-2">
-                    <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto" />
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <Link
-                        to="/admin"
-                        className="hidden sm:inline-block text-indigo font-semibold hover:opacity-80 transition-all"
-                    >
-                        Dashboard
-                    </Link>
-
-                    <Link
-                        to="/"
-                        className="hidden sm:inline-block text-indigo font-semibold hover:opacity-80 transition-all"
-                    >
-                        Retour au site
-                    </Link>
-
-                    <button
-                        onClick={handleLogout}
-                        className="bg-indigo text-white px-4 py-2 rounded-xl font-semibold hover:bg-indigo/90 transition-all"
-                    >
-                        Déconnexion
-                    </button>
-                </div>
-            </header>
+            <Header />
 
             <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
                 <div className="max-w-7xl mx-auto space-y-6">
@@ -134,46 +100,68 @@ function AdminUsersPage() {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {users.map((u) => (
-                                            <tr key={u.id} className="border-b border-indigo/5">
-                                                <td className="py-2 pr-4 text-indigo/70">{u.id}</td>
-                                                <td className="py-2 pr-4 text-indigo font-medium">
-                                                    {u.email}
-                                                </td>
-                                                <td className="py-2 pr-4 text-indigo/80">
-                                                    {(u.firstName || '') + ' ' + (u.lastName || '')}
-                                                </td>
-                                                <td className="py-2 pr-4">
-                                                    <select
-                                                        value={u.role}
-                                                        onChange={(e) =>
-                                                            handleRoleChange(u.id, e.target.value)
-                                                        }
-                                                        className="border border-indigo/20 rounded-lg px-2 py-1 text-xs"
-                                                    >
-                                                        <option value="USER">USER</option>
-                                                        <option value="ADMIN">ADMIN</option>
-                                                    </select>
-                                                </td>
-                                                <td className="py-2 pr-4 text-indigo/70">
-                                                    {new Date(u.createdAt).toLocaleDateString('fr-FR')}
-                                                </td>
-                                                <td className="py-2 pr-4 text-right">
-                                                    {u.id === currentUser?.id ? (
-                                                        <span className="text-xs text-indigo/50">
-                                                                (vous)
-                                                            </span>
-                                                    ) : (
-                                                        <button
-                                                            onClick={() => handleDelete(u.id)}
-                                                            className="text-xs text-red-600 font-semibold hover:underline"
-                                                        >
-                                                            Supprimer
-                                                        </button>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {users.map((u) => {
+                                            const isCurrentUser = u.id === currentUser?.id
+                                            const isSuperAdmin = u.role === 'SUPER_ADMIN'
+
+                                            return (
+                                                <tr key={u.id} className="border-b border-indigo/5">
+                                                    <td className="py-2 pr-4 text-indigo/70">{u.id}</td>
+                                                    <td className="py-2 pr-4 text-indigo font-medium">
+                                                        {u.email}
+                                                    </td>
+                                                    <td className="py-2 pr-4 text-indigo/80">
+                                                        {(u.firstName || '') +
+                                                            ' ' +
+                                                            (u.lastName || '')}
+                                                    </td>
+                                                    <td className="py-2 pr-4">
+                                                        {isSuperAdmin ? (
+                                                            <span className="text-xs font-bold text-indigo">
+                                                                    SUPER_ADMIN
+                                                                </span>
+                                                        ) : (
+                                                            <select
+                                                                value={u.role}
+                                                                onChange={(e) =>
+                                                                    handleRoleChange(
+                                                                        u.id,
+                                                                        e.target.value,
+                                                                    )
+                                                                }
+                                                                className="border border-indigo/20 rounded-lg px-2 py-1 text-xs"
+                                                            >
+                                                                <option value="USER">USER</option>
+                                                                <option value="ADMIN">ADMIN</option>
+                                                            </select>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-2 pr-4 text-indigo/70">
+                                                        {new Date(
+                                                            u.createdAt,
+                                                        ).toLocaleDateString('fr-FR')}
+                                                    </td>
+                                                    <td className="py-2 pr-4 text-right">
+                                                        {isSuperAdmin ? (
+                                                            <span className="text-xs text-indigo font-semibold">
+                                                                    Super admin protégé
+                                                                </span>
+                                                        ) : isCurrentUser ? (
+                                                            <span className="text-xs text-indigo">
+                                                                    (vous)
+                                                                </span>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => handleDelete(u.id)}
+                                                                className="text-xs text-red-600 font-semibold hover:underline"
+                                                            >
+                                                                Supprimer
+                                                            </button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
                                         </tbody>
                                     </table>
                                 </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import logo from '../assets/logo.webp'
 import { getPropertyById } from '../services/properties'
+import Header from "../../components/Header.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -62,24 +62,7 @@ function BienPage() {
 
     return (
         <div className="min-h-screen bg-snow font-sans antialiased flex flex-col">
-            <header className="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl">
-                <div className="flex items-center space-x-2">
-                    <Link to="/">
-                        <img
-                            src={logo}
-                            alt="Ymmo"
-                            className="h-9 sm:h-10 lg:h-12 w-auto cursor-pointer"
-                        />
-                    </Link>
-                </div>
-
-                <Link
-                    to="/biens"
-                    className="bg-indigo text-white text-sm px-4 sm:px-6 py-2 rounded-xl hover:bg-indigo/90 transition-all shadow-lg"
-                >
-                    Tous les biens
-                </Link>
-            </header>
+            <Header />
 
             <main className="flex-1 px-4 sm:px-6 lg:px-12 py-8 sm:py-12">
                 <section className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
