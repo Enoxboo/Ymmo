@@ -1,19 +1,18 @@
-import { Navigate, Outlet } from 'react-router-dom'
-import { getToken, getUser } from '../src/services/auth'
+import { Navigate } from 'react-router-dom'
+import { getUser } from '../src/services/auth'
 
-function ProtectedRoute({ allowedRoles = [] }) {
-    const token = getToken()
+function ProtectedRoute({ children, requiredRole = 'ADMIN' }) {
     const user = getUser()
 
-    if (!token || !user) {
+    if (!user) {
         return <Navigate to="/login" replace />
     }
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    if (requiredRole && user.role !== requiredRole) {
         return <Navigate to="/" replace />
     }
 
-    return <Outlet />
+    return children
 }
 
 export default ProtectedRoute

@@ -6,6 +6,7 @@ const cors = require('cors')
 const authRoutes = require('./Routes/auth')
 const adminRoutes = require('./Routes/admin')
 const propertyRoutes = require('./Routes/properties')
+const userRoutes = require('./Routes/users')
 
 const app = express()
 
@@ -26,6 +27,15 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/properties', propertyRoutes)
+app.use('/api/users', userRoutes)
+const agencyRoutes = require('./Routes/agencies')
+app.use('/api/agencies', agencyRoutes)
+const path = require('path')
+const uploadRoutes = require('./Routes/upload')
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+
+app.use('/api/upload', uploadRoutes)
 
 app.listen(PORT, () => {
     console.log(`Serveur lancé sur http://localhost:${PORT}`)
