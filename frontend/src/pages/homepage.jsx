@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.webp'
-import { getUser, isAuthenticated, logoutUser } from '../services/auth'
+import { getUser, logoutUser } from '../services/auth'
 import { getProperties } from '../services/properties'
 
 function HomePage() {
     const navigate = useNavigate()
     const [user, setUser] = useState(null)
-    const [loggedIn, setLoggedIn] = useState(false)
     const [latest, setLatest] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
 
     useEffect(() => {
         setUser(getUser())
-        setLoggedIn(isAuthenticated())
     }, [])
 
     useEffect(() => {
@@ -22,7 +20,6 @@ function HomePage() {
             try {
                 setLoading(true)
                 setError('')
-                // 3 derniers biens
                 const data = await getProperties({ page: 1, take: 3 })
                 setLatest(data)
             } catch (err) {
@@ -38,7 +35,6 @@ function HomePage() {
     function handleLogout() {
         logoutUser()
         setUser(null)
-        setLoggedIn(false)
         navigate('/login')
     }
 
@@ -50,14 +46,25 @@ function HomePage() {
         }).format(price)
     }
 
+    const loggedIn = !!user
+
     return (
         <div className="min-h-screen bg-snow font-sans antialiased flex flex-col">
             <header className="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl sticky top-0 z-50">
                 <div className="flex items-center space-x-2">
-                    <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto" />
+                    <Link to="/">
+                        <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto" />
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <Link
+                        to="/about"
+                        className="hidden sm:inline text-indigo font-semibold hover:opacity-80 transition-all"
+                    >
+                        À propos
+                    </Link>
+
                     {loggedIn ? (
                         <>
                             <span className="hidden sm:inline text-indigo font-semibold">
@@ -67,7 +74,7 @@ function HomePage() {
                             {user?.role === 'ADMIN' && (
                                 <Link
                                     to="/admin"
-                                    className="bg-white text-indigo text-sm px-4 py-2 rounded-xl font-bold"
+                                    className="bg-white text-indigo text-sm px-4 py-2 rounded-xl font-bold hover:bg-white/90 transition-all"
                                 >
                                     Admin
                                 </Link>
@@ -75,7 +82,7 @@ function HomePage() {
 
                             <button
                                 onClick={handleLogout}
-                                className="bg-indigo text-white text-sm px-4 py-2 rounded-xl font-bold"
+                                className="bg-indigo text-white text-sm px-4 py-2 rounded-xl font-bold hover:bg-indigo/90 transition-all"
                             >
                                 Déconnexion
                             </button>
@@ -84,14 +91,14 @@ function HomePage() {
                         <>
                             <Link
                                 to="/login"
-                                className="bg-indigo text-white text-sm px-4 py-2 rounded-xl font-bold"
+                                className="bg-indigo text-white text-sm px-4 py-2 rounded-xl font-bold hover:bg-indigo/90 transition-all"
                             >
                                 Se connecter
                             </Link>
 
                             <Link
                                 to="/register"
-                                className="bg-white text-indigo text-sm px-4 py-2 rounded-xl font-bold"
+                                className="bg-white text-indigo text-sm px-4 py-2 rounded-xl font-bold hover:bg-white/90 transition-all"
                             >
                                 S’inscrire
                             </Link>

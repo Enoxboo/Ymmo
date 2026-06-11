@@ -2,12 +2,17 @@ import { Link, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import logo from '../assets/logo.webp'
 import { getPropertyById } from '../services/properties'
+import { getUser } from '../services/auth'
+
+const API_URL = import.meta.env.VITE_API_URL
+const FILE_URL = import.meta.env.VITE_FILE_URL || API_URL.replace('/api', '')
 
 function BienPage() {
     const { id } = useParams()
     const [bien, setBien] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const currentUser = getUser()
 
     useEffect(() => {
         async function loadProperty() {
@@ -49,8 +54,15 @@ function BienPage() {
         }
     }
 
+    function buildImageUrl(url) {
+        if (!url) return null
+        if (url.startsWith('http')) return url
+        return `${FILE_URL}${url}`
+    }
+
     function getMainPhoto(property) {
-        return property?.photos?.[0]?.url || 'https://via.placeholder.com/1200x700?text=Bien'
+        const url = property?.photos?.[0]?.url
+        return buildImageUrl(url)
     }
 
     if (loading) {
@@ -78,11 +90,15 @@ function BienPage() {
         )
     }
 
+    const mainPhoto = getMainPhoto(bien)
+
     return (
         <div className="min-h-screen bg-snow font-sans antialiased flex flex-col">
             <header className="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl sticky top-0 z-50">
                 <div className="flex items-center space-x-2">
-                    <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto" />
+                    <Link to="/">
+                        <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto cursor-pointer" />
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -92,12 +108,24 @@ function BienPage() {
                     >
                         Retour aux biens
                     </Link>
-                    <Link
-                        to="/login"
-                        className="bg-indigo text-white text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap"
-                    >
-                        Se connecter
-                    </Link>
+
+                    {currentUser ? (
+                        <Link
+                            to={currentUser.role === 'ADMIN' ? '/admin' : '/'}
+                            className="bg-indigo text-white text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-xl hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap"
+                        >
+                            {currentUser.role === 'ADMIN'
+                                ? `Admin (${currentUser.email})`
+                                : `Mon compte (${currentUser.email})`}
+                        </Link>
+                    ) : (
+                        <Link
+                            to="/login"
+                            className="bg-indigo text-white text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap"
+                        >
+                            Se connecter
+                        </Link>
+                    )}
                 </div>
             </header>
 
@@ -124,26 +152,32 @@ function BienPage() {
                     <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                         <div className="lg:col-span-2 space-y-4">
                             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-                                <img
-                                    src={getMainPhoto(bien)}
-                                    alt={bien.title}
-                                    className="w-full h-[260px] sm:h-[380px] lg:h-[460px] object-cover"
-                                />
+                                {mainPhoto && (
+                                    <img
+                                        src={mainPhoto}
+                                        alt={bien.title}
+                                        className="w-full h-[260px] sm:h-[380px] lg:h-[460px] object-cover"
+                                    />
+                                )}
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">
-                                {(bien.photos || []).slice(1, 4).map((photo) => (
-                                    <div
-                                        key={photo.id}
-                                        className="bg-white rounded-2xl shadow-lg overflow-hidden"
-                                    >
-                                        <img
-                                            src={photo.url}
-                                            alt={photo.alt || bien.title}
-                                            className="w-full h-24 sm:h-32 object-cover"
-                                        />
-                                    </div>
-                                ))}
+                                {(bien.photos || []).slice(1, 4).map((photo) => {
+                                    const url = buildImageUrl(photo.url)
+                                    if (!url) return null
+                                    return (
+                                        <div
+                                            key={photo.id}
+                                            className="bg-white rounded-2xl shadow-lg overflow-hidden"
+                                        >
+                                            <img
+                                                src={url}
+                                                alt={photo.alt || bien.title}
+                                                className="w-full h-24 sm:h-32 object-cover"
+                                            />
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
 
@@ -166,11 +200,15 @@ function BienPage() {
                                 </div>
                                 <div className="bg-snow rounded-2xl p-4 text-center">
                                     <p className="text-xs text-indigo/60 mb-1">Chambres</p>
-                                    <p className="text-lg font-black text-indigo">{bien.bedrooms}</p>
+                                    <p className="text-lg font-black text-indigo">
+                                        {bien.bedrooms ?? '—'}
+                                    </p>
                                 </div>
                                 <div className="bg-snow rounded-2xl p-4 text-center">
                                     <p className="text-xs text-indigo/60 mb-1">Salle de bain</p>
-                                    <p className="text-lg font-black text-indigo">{bien.bathrooms}</p>
+                                    <p className="text-lg font-black text-indigo">
+                                        {bien.bathrooms ?? '—'}
+                                    </p>
                                 </div>
                                 <div className="bg-snow rounded-2xl p-4 text-center">
                                     <p className="text-xs text-indigo/60 mb-1">Étage</p>
@@ -218,23 +256,33 @@ function BienPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="bg-snow rounded-2xl p-4">
                                         <p className="text-sm text-indigo/60">Type</p>
-                                        <p className="font-bold text-indigo">{bien.subType || formatType(bien.type)}</p>
+                                        <p className="font-bold text-indigo">
+                                            {bien.subType || formatType(bien.type)}
+                                        </p>
                                     </div>
                                     <div className="bg-snow rounded-2xl p-4">
                                         <p className="text-sm text-indigo/60">Ascenseur</p>
-                                        <p className="font-bold text-indigo">{bien.elevator ? 'Oui' : 'Non'}</p>
+                                        <p className="font-bold text-indigo">
+                                            {bien.elevator ? 'Oui' : 'Non'}
+                                        </p>
                                     </div>
                                     <div className="bg-snow rounded-2xl p-4">
                                         <p className="text-sm text-indigo/60">Parking</p>
-                                        <p className="font-bold text-indigo">{bien.parking ? 'Oui' : 'Non'}</p>
+                                        <p className="font-bold text-indigo">
+                                            {bien.parking ? 'Oui' : 'Non'}
+                                        </p>
                                     </div>
                                     <div className="bg-snow rounded-2xl p-4">
                                         <p className="text-sm text-indigo/60">Balcon</p>
-                                        <p className="font-bold text-indigo">{bien.balcony ? 'Oui' : 'Non'}</p>
+                                        <p className="font-bold text-indigo">
+                                            {bien.balcony ? 'Oui' : 'Non'}
+                                        </p>
                                     </div>
                                     <div className="bg-snow rounded-2xl p-4">
                                         <p className="text-sm text-indigo/60">Terrasse</p>
-                                        <p className="font-bold text-indigo">{bien.terrace ? 'Oui' : 'Non'}</p>
+                                        <p className="font-bold text-indigo">
+                                            {bien.terrace ? 'Oui' : 'Non'}
+                                        </p>
                                     </div>
                                     <div className="bg-snow rounded-2xl p-4">
                                         <p className="text-sm text-indigo/60">DPE / GES</p>
@@ -265,7 +313,7 @@ function BienPage() {
                         </div>
 
                         <div className="space-y-6">
-                            <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
+                            <div className="bg-white rounded-3xl shadow-2xl p-6 sm:px-8">
                                 <h2 className="text-2xl font-black text-indigo mb-4">
                                     Localisation
                                 </h2>

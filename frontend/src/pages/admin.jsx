@@ -9,6 +9,7 @@ function AdminPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const user = getUser()
+    const currentUser = user
 
     useEffect(() => {
         async function loadDashboard() {
@@ -41,23 +42,34 @@ function AdminPage() {
         <div className="min-h-screen bg-snow font-sans antialiased flex flex-col">
             <header className="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl sticky top-0 z-50">
                 <div className="flex items-center space-x-2">
-                    <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto" />
+                    <Link to="/">
+                        <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto cursor-pointer" />
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <Link
-                        to="/"
+                        to="/biens"
                         className="hidden sm:inline-block text-indigo font-semibold hover:opacity-80 transition-all"
                     >
-                        Retour au site
+                        Retour aux biens
                     </Link>
 
-                    <button
-                        onClick={handleLogout}
-                        className="bg-indigo text-white px-4 py-2 rounded-xl font-semibold hover:bg-indigo/90 transition-all"
-                    >
-                        Déconnexion
-                    </button>
+                    {currentUser ? (
+                        <button
+                            onClick={handleLogout}
+                            className="bg-indigo text-white text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-xl hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap"
+                        >
+                            Déconnexion ({currentUser.email})
+                        </button>
+                    ) : (
+                        <Link
+                            to="/login"
+                            className="bg-indigo text-white text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap"
+                        >
+                            Se connecter
+                        </Link>
+                    )}
                 </div>
             </header>
 
@@ -85,22 +97,58 @@ function AdminPage() {
                     )}
 
                     {stats && (
-                        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <article className="bg-white rounded-3xl shadow-2xl p-6">
-                                <p className="text-sm text-indigo/60">Utilisateurs</p>
-                                <p className="text-3xl font-black text-indigo mt-2">{stats.users}</p>
-                            </article>
+                        <>
+                            <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <article className="bg-white rounded-3xl shadow-2xl p-6">
+                                    <p className="text-sm text-indigo/60">Utilisateurs</p>
+                                    <p className="text-3xl font-black text-indigo mt-2">{stats.users}</p>
+                                </article>
 
-                            <article className="bg-white rounded-3xl shadow-2xl p-6">
-                                <p className="text-sm text-indigo/60">Biens</p>
-                                <p className="text-3xl font-black text-indigo mt-2">{stats.properties}</p>
-                            </article>
+                                <article className="bg-white rounded-3xl shadow-2xl p-6">
+                                    <p className="text-sm text-indigo/60">Biens</p>
+                                    <p className="text-3xl font-black text-indigo mt-2">{stats.properties}</p>
+                                </article>
 
-                            <article className="bg-white rounded-3xl shadow-2xl p-6">
-                                <p className="text-sm text-indigo/60">Agences</p>
-                                <p className="text-3xl font-black text-indigo mt-2">{stats.agencies}</p>
-                            </article>
-                        </section>
+                                <article className="bg-white rounded-3xl shadow-2xl p-6">
+                                    <p className="text-sm text-indigo/60">Agences</p>
+                                    <p className="text-3xl font-black text-indigo mt-2">{stats.agencies}</p>
+                                </article>
+                            </section>
+
+                            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <article className="bg-white rounded-3xl shadow-2xl p-6 flex flex-col justify-between">
+                                    <div>
+                                        <h2 className="text-xl font-black text-indigo mb-2">
+                                            Gérer les utilisateurs
+                                        </h2>
+                                    </div>
+                                    <div>
+                                        <Link
+                                            to="/admin/users"
+                                            className="inline-flex items-center bg-indigo text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo/90 transition-all"
+                                        >
+                                            Accéder à la gestion utilisateurs
+                                        </Link>
+                                    </div>
+                                </article>
+
+                                <article className="bg-white rounded-3xl shadow-2xl p-6 flex flex-col justify-between">
+                                    <div>
+                                        <h2 className="text-xl font-black text-indigo mb-2">
+                                            Gérer les biens
+                                        </h2>
+                                    </div>
+                                    <div>
+                                        <Link
+                                            to="/admin/properties"
+                                            className="inline-flex items-center bg-amber text-indigo px-4 py-2 rounded-xl text-sm font-semibold hover:bg-amber/90 transition-all"
+                                        >
+                                            Accéder à la gestion des biens
+                                        </Link>
+                                    </div>
+                                </article>
+                            </section>
+                        </>
                     )}
                 </div>
             </main>
