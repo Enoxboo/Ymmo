@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import logo from '../assets/logo.webp'
-import { getUser, logoutUser } from '../services/auth'
+import { getUser} from '../services/auth'
 import {
     getProperties,
     createProperty,
@@ -10,9 +8,9 @@ import {
 } from '../services/properties'
 import { getAgencies } from '../services/agencies'
 import { uploadFile } from '../services/upload'
+import Header from "../../components/Header.jsx";
 
 function AdminPropertiesPage() {
-    const navigate = useNavigate()
     const currentUser = getUser()
 
     const [properties, setProperties] = useState([])
@@ -68,10 +66,6 @@ function AdminPropertiesPage() {
         load()
     }, [page, query])
 
-    function handleLogout() {
-        logoutUser()
-        navigate('/login')
-    }
 
     function resetForm() {
         setForm({
@@ -224,40 +218,7 @@ function AdminPropertiesPage() {
 
     return (
         <div className="min-h-screen bg-snow font-sans antialiased flex flex-col">
-            <header className="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl sticky top-0 z-50">
-                <div className="flex items-center space-x-2">
-                    <Link to="/">
-                        <img
-                            src={logo}
-                            alt="Ymmo"
-                            className="h-9 sm:h-10 lg:h-12 w-auto cursor-pointer"
-                        />
-                    </Link>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <Link
-                        to="/admin"
-                        className="hidden sm:inline-block text-indigo font-semibold hover:opacity-80 transition-all"
-                    >
-                        Dashboard
-                    </Link>
-
-                    <Link
-                        to="/"
-                        className="hidden sm:inline-block text-indigo font-semibold hover:opacity-80 transition-all"
-                    >
-                        Retour au site
-                    </Link>
-
-                    <button
-                        onClick={handleLogout}
-                        className="bg-indigo text-white px-4 py-2 rounded-xl font-semibold hover:bg-indigo/90 transition-all"
-                    >
-                        Déconnexion
-                    </button>
-                </div>
-            </header>
+            <Header />
 
             <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
                 <div className="max-w-7xl mx-auto space-y-6">

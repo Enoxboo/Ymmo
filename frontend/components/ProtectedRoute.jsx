@@ -8,6 +8,10 @@ function ProtectedRoute({ children, requiredRole = 'ADMIN' }) {
         return <Navigate to="/login" replace />
     }
 
+    if (user.role === 'SUPER_ADMIN') {
+        return children
+    }
+
     if (requiredRole && user.role !== requiredRole) {
         return <Navigate to="/" replace />
     }

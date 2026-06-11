@@ -1,47 +1,14 @@
 import { Link } from 'react-router-dom'
-import logo from '../assets/logo.webp'
 import france from '../assets/france.webp'
 import { getUser } from '../services/auth'
+import Header from "../../components/Header.jsx";
 
 function AboutPage() {
     const currentUser = getUser()
 
     return (
         <div className="min-h-screen bg-snow font-sans antialiased flex flex-col">
-            <header className="bg-amber h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 shadow-xl sticky top-0 z-50">
-                <div className="flex items-center space-x-2">
-                    <Link to="/">
-                        <img src={logo} alt="Ymmo" className="h-9 sm:h-10 lg:h-12 w-auto cursor-pointer" />
-                    </Link>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <Link
-                        to="/biens"
-                        className="hidden sm:inline-block text-indigo font-semibold hover:opacity-80 transition-all"
-                    >
-                        Retour aux biens
-                    </Link>
-
-                    {currentUser ? (
-                        <Link
-                            to={currentUser.role === 'ADMIN' ? '/admin' : '/'}
-                            className="bg-indigo text-white text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-xl hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap"
-                        >
-                            {currentUser.role === 'ADMIN'
-                                ? `Admin (${currentUser.email})`
-                                : `Mon compte (${currentUser.email})`}
-                        </Link>
-                    ) : (
-                        <Link
-                            to="/login"
-                            className="bg-indigo text-white text-sm px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl hover:bg-indigo/90 transition-all shadow-lg whitespace-nowrap"
-                        >
-                            Se connecter
-                        </Link>
-                    )}
-                </div>
-            </header>
+            <Header />
 
             <main className="flex-1 flex flex-col items-center px-4 sm:px-6 lg:px-12 py-12 sm:py-16">
                 <section className="w-full max-w-6xl text-center mb-16">
