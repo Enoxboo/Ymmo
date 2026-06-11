@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum PropertyType {
+  APPARTEMENT
+  MAISON
+  LOCAL
+  TERRAIN
+  AUTRE
+}
+
+enum EnergyRating {
+  A
+  B
+  C
+  D
+  E
+  F
+  G
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Agency {
+  id         Int        @id @default(autoincrement())
+  name       String
+  email      String?
+  phone      String?
+  address    String?
+  city       String?
+  postalCode String?
+  properties Property[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Property {
+  id            Int                 @id @default(autoincrement())
+  reference     String              @unique
+  title         String
+  description   String?
+  price         Int
+  city          String
+  postalCode    String
+  address       String?
+  district      String?
+  transportInfo String?
+  type          PropertyType
+  subType       String?
+  surface       Int
+  rooms         Int
+  bedrooms      Int                 @default(0)
+  bathrooms     Int                 @default(0)
+  floor         Int?
+  elevator      Boolean             @default(false)
+  parking       Boolean             @default(false)
+  balcony       Boolean             @default(false)
+  terrace       Boolean             @default(false)
+  available     Boolean             @default(true)
+  dpe           EnergyRating?
+  ges           EnergyRating?
+  agencyId      Int
+  agency        Agency              @relation(fields: [agencyId], references: [id])
+  photos        PropertyPhoto[]
+  highlights    PropertyHighlight[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model PropertyPhoto {
+  id         Int      @id @default(autoincrement())
+  url        String
+  alt        String?
+  position   Int      @default(0)
+  propertyId Int
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+}
+
+model PropertyHighlight {
+  id         Int      @id @default(autoincrement())
+  label      String
+  position   Int      @default(0)
+  propertyId Int
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+}
