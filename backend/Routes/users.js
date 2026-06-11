@@ -5,6 +5,7 @@ const { requireAuth, requireRole } = require('../Middlewares/auth')
 
 const router = express.Router()
 
+// GET /api/users
 router.get('/', requireAuth, requireRole('ADMIN'), async (req, res) => {
     const { skip = 0, take = 20 } = req.query
 
@@ -33,6 +34,7 @@ router.get('/', requireAuth, requireRole('ADMIN'), async (req, res) => {
     }
 })
 
+// PUT /api/users/:id/role
 router.put('/:id/role', requireAuth, requireRole('ADMIN'), async (req, res) => {
     const id = parseInt(req.params.id, 10)
     const { role } = req.body
@@ -41,11 +43,28 @@ router.put('/:id/role', requireAuth, requireRole('ADMIN'), async (req, res) => {
         return res.status(400).json({ error: 'ID invalide' })
     }
 
+    // On ne permet que USER ou ADMIN via cette route
     if (!role || !['USER', 'ADMIN'].includes(role)) {
         return res.status(400).json({ error: 'Rôle invalide' })
     }
 
     try {
+        const targetUser = await prisma.user.findUnique({
+            where: { id },
+            select: { id: true, role: true },
+        })
+
+        if (!targetUser) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' })
+        }
+
+        // On interdit de modifier le rôle d’un SUPER_ADMIN
+        if (targetUser.role === 'SUPER_ADMIN') {
+            return res
+                .status(403)
+                .json({ error: 'Impossible de modifier le rôle du super admin' })
+        }
+
         const user = await prisma.user.update({
             where: { id },
             data: { role },
@@ -69,6 +88,7 @@ router.put('/:id/role', requireAuth, requireRole('ADMIN'), async (req, res) => {
     }
 })
 
+// DELETE /api/users/:id
 router.delete('/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
     const id = parseInt(req.params.id, 10)
 
@@ -77,6 +97,22 @@ router.delete('/:id', requireAuth, requireRole('ADMIN'), async (req, res) => {
     }
 
     try {
+        const targetUser = await prisma.user.findUnique({
+            where: { id },
+            select: { id: true, role: true },
+        })
+
+        if (!targetUser) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' })
+        }
+
+        // On interdit de supprimer le SUPER_ADMIN
+        if (targetUser.role === 'SUPER_ADMIN') {
+            return res
+                .status(403)
+                .json({ error: 'Impossible de supprimer le super admin' })
+        }
+
         await prisma.user.delete({
             where: { id },
         })
