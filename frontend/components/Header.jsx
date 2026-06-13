@@ -35,6 +35,13 @@ function Header() {
                     À propos
                 </Link>
 
+                <Link
+                    to="/statistiques"
+                    className="hidden sm:inline-block text-indigo font-semibold hover:opacity-80 transition-all"
+                >
+                    Statistiques
+                </Link>
+
                 {isAdmin && (
                     <Link
                         to="/admin"

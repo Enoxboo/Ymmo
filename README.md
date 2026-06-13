@@ -16,7 +16,7 @@ Elle propose un espace public pour les visiteurs, un espace d’administration p
 - **Base de données**
     - PostgreSQL
 
-## ✨ Fonctionnalités principales
+## Fonctionnalités principales
 
 - Consultation des biens :
     - Page d’accueil avec les derniers biens publiés

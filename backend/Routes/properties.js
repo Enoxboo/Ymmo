@@ -52,8 +52,11 @@ router.get('/:id', async (req, res) => {
     try {
         const id = Number(req.params.id)
 
-        const property = await prisma.property.findUnique({
+        const property = await prisma.property.update({
             where: { id },
+            data: {
+                viewCount: { increment: 1 },
+            },
             include: {
                 photos: {
                     orderBy: { position: 'asc' },

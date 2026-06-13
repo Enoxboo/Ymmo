@@ -10,7 +10,9 @@ const propertyRoutes = require('./Routes/properties')
 const userRoutes = require('./Routes/users')
 const agencyRoutes = require('./Routes/agencies')
 const uploadRoutes = require('./Routes/upload')
-const { ensureSeedUsers } = require('./initSuperAdmin') // <-- nouveau nom
+const { ensureSeedUsers } = require('./initSuperAdmin')
+const analyticsRoutes = require('./Routes/analytics')
+
 
 const app = express()
 
@@ -37,7 +39,10 @@ app.use('/api/users', userRoutes)
 app.use('/api/agencies', agencyRoutes)
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-app.use('/api/upload', uploadRoutes)
+    app.use('/api/upload', uploadRoutes)
+
+app.use('/api/analytics', analyticsRoutes)
+
 
 ensureSeedUsers()
     .then(() => {

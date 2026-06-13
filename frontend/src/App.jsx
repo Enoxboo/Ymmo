@@ -9,6 +9,7 @@ import BienAllPage from './pages/bien-all'
 import AdminUsersPage from './pages/admin-users'
 import AdminPropertiesPage from './pages/admin-properties'
 import ProtectedRoute from '../components/ProtectedRoute'
+import StatisticsPage from "./pages/statistics.jsx";
 
 function App() {
     return (
@@ -20,6 +21,8 @@ function App() {
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/biens" element={<BienAllPage />} />
                 <Route path="/biens/:id" element={<BienPage />} />
+                <Route path="/statistiques" element={<StatisticsPage />} />
+
 
                 <Route
                     path="/admin"
